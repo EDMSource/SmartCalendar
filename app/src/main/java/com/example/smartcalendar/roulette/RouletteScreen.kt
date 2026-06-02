@@ -1,5 +1,6 @@
 package com.example.smartcalendar.roulette
 
+<<<<<<< HEAD
 
 
 
@@ -17,6 +18,8 @@ import com.example.smartcalendar.utils.LogCollector
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
+=======
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -70,10 +73,13 @@ private val rewards = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouletteScreen(onClose: () -> Unit) {
+<<<<<<< HEAD
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
+=======
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     var isSpinning by remember { mutableStateOf(false) }
     var result by remember { mutableStateOf<Reward?>(null) } //null пока не крутили
     var spinCount by remember { mutableStateOf(0) }
@@ -102,6 +108,7 @@ fun RouletteScreen(onClose: () -> Unit) {
             delay(pause)
         }
 
+<<<<<<< HEAD
         val wonReward = rewards[shownIndex]
         result = wonReward
         Log.d("Roulette", "Выиграна награда: ${wonReward.name}")
@@ -121,6 +128,11 @@ fun RouletteScreen(onClose: () -> Unit) {
         isSpinning = false
         spinCount++
 
+=======
+        result = rewards[shownIndex] //фиксируем итоговую награду
+        isSpinning = false
+        spinCount++
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     }
 
     Scaffold(

@@ -1,5 +1,6 @@
 package com.example.smartcalendar.screens
 
+<<<<<<< HEAD
 
 import android.content.Context
 import android.util.Log
@@ -13,6 +14,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 
 
+=======
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -47,13 +50,17 @@ private val WEEK_DAYS = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "
 
 @Composable
 fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     var showSearchDialog by remember { mutableStateOf(false) }
     var searchQuery      by remember { mutableStateOf("") }
     var showDayPicker    by remember { mutableStateOf(false) }
     var pickedDay        by remember { mutableStateOf<Int?>(null) }
+<<<<<<< HEAD
 
     var showHolidays by remember { mutableStateOf(true) }
 
@@ -84,12 +91,21 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
     var currentDate by remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
 
 
+=======
+    var managingDay      by remember { mutableStateOf<Int?>(null) }
+    var currentDate      by remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
+    val notes            = remember { mutableStateMapOf<String, MutableList<String>>() } // заметки в памяти
+
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     val today          = LocalDate.now()
     val daysInMonth    = currentDate.lengthOfMonth()
     val firstDayOfWeek = currentDate.dayOfWeek.value // 1=Пн, 7=Вс
     val monthName      = currentDate.format(DateTimeFormatter.ofPattern("LLLL yyyy", Locale.forLanguageTag("ru")))
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 
     val holidays = remember {
         mapOf(
@@ -219,10 +235,17 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
                         isToday     = isToday,
                         hasNote     = notes[key]?.isNotEmpty() == true,
                         onClick     = { managingDay = calDay.day },
+<<<<<<< HEAD
                         holidayName = if (showHolidays) holiday else null
                     )
                 } else {
                     InactiveDayCell(day = calDay.day, holidayName = if (showHolidays) holiday else null)
+=======
+                        holidayName = holiday
+                    )
+                } else {
+                    InactiveDayCell(day = calDay.day, holidayName = holiday)
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                 }
             }
         }
@@ -319,7 +342,10 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
                             if (newNoteText.isNotBlank()) {
                                 val list = notes.getOrPut(dateKey) { mutableListOf() }
                                 list.add(newNoteText)
+<<<<<<< HEAD
                                 saveNotesToDataStore(context)   // <-- добавили context
+=======
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                                 newNoteText = ""
                             }
                         },
@@ -403,6 +429,7 @@ fun DayCell(
     isToday: Boolean,
     hasNote: Boolean,
     onClick: () -> Unit,
+<<<<<<< HEAD
     holidayName: String? = null
 ) {
     // Цвет фона: праздник → жёлтый, сегодня → цвет todayColor из темы, иначе primaryContainer
@@ -414,6 +441,16 @@ fun DayCell(
     // Цвет текста: сегодня → onPrimaryContainer, иначе onPrimaryContainer (можно и onPrimary)
     val txtColor = if (isToday) MaterialTheme.colorScheme.onPrimaryContainer
     else MaterialTheme.colorScheme.onPrimaryContainer
+=======
+    holidayName: String? = null // название праздника если есть
+) {
+    val bgColor  = when {
+        holidayName != null -> Color.Yellow // праздник — жёлтый
+        isToday             -> TodayColor
+        else                -> MaterialTheme.colorScheme.primaryContainer
+    }
+    val txtColor = if (isToday) TodayOnColor else MaterialTheme.colorScheme.onPrimaryContainer
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 
     Box(
         modifier = Modifier
@@ -434,8 +471,12 @@ fun DayCell(
                 fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
                 color = txtColor
             )
+<<<<<<< HEAD
             if (hasNote) {
                 // Точка-индикатор: цвет зависит от темы
+=======
+            if (hasNote) { // точка-индикатор заметки
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                 Box(
                     modifier = Modifier
                         .size(5.dp)
@@ -446,7 +487,11 @@ fun DayCell(
                         )
                 )
             }
+<<<<<<< HEAD
             if (holidayName != null) {
+=======
+            if (holidayName != null) { // подпись праздника
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                 Text(
                     text = holidayName,
                     fontSize = 9.sp,

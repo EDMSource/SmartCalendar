@@ -1,5 +1,6 @@
 package com.example.smartcalendar.screens
 
+<<<<<<< HEAD
 
 
 import androidx.compose.foundation.background
@@ -16,6 +17,8 @@ import android.widget.Toast
 
 
 import android.util.Log
+=======
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -33,11 +36,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+<<<<<<< HEAD
 import androidx.compose.ui.platform.LocalContext
+=======
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.smartcalendar.roulette.RouletteScreen
+<<<<<<< HEAD
 import com.example.smartcalendar.utils.ThemeManager
 
 import com.example.smartcalendar.utils.LogCollector
@@ -47,10 +54,13 @@ import kotlinx.coroutines.launch
 
 
 private const val REPORT_EMAIL = "your-email@example.com"   // замените на реальный email
+=======
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(onClose: () -> Unit) {
+<<<<<<< HEAD
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -195,6 +205,18 @@ fun SettingsScreen(onClose: () -> Unit) {
     }
 
 
+=======
+    var showRoulette by remember { mutableStateOf(false) }
+    var secretClicks by remember { mutableStateOf(0) } //счётчик тайных кликов
+    var lastClickTime by remember { mutableStateOf(0L) } //время последнего клика
+
+    //если открыли рулетку - показываем её вместо настроек
+    if (showRoulette) {
+        RouletteScreen(onClose = { showRoulette = false })
+        return
+    }
+
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     Scaffold(
         topBar = {
             TopAppBar(
@@ -215,6 +237,7 @@ fun SettingsScreen(onClose: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
+<<<<<<< HEAD
             SectionHeader("Внешний вид")
 
             SettingsItem(
@@ -276,27 +299,89 @@ fun SettingsScreen(onClose: () -> Unit) {
                 Switch(checked = showHolidays, onCheckedChange = {})
             }
 
+=======
+
+            //раздел внешний вид
+            SectionHeader("Внешний вид")
+
+            SettingsItem(
+                icon = Icons.Default.Palette,
+                title = "Тема",
+                subtitle = "Системная (авто)",
+                onClick = { /*TODO*/ }
+            ) {
+                //маленький чип-бейдж справа
+                Surface(
+                    shape = RoundedCornerShape(50),
+                    color = MaterialTheme.colorScheme.secondaryContainer
+                ) {
+                    Text(
+                        text = "Авто",
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
+            }
+
+            //раздел календарь
+            SectionHeader("Календарь")
+
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             SettingsItem(
                 icon = Icons.Default.Language,
                 title = "Начало недели",
                 subtitle = "Понедельник",
+<<<<<<< HEAD
                 onClick = {}
             )
 
             SectionHeader("Заметки")
+=======
+                onClick = { /*TODO*/ }
+            )
+
+            SettingsItem(
+                icon = Icons.Default.Celebration,
+                title = "Показывать праздники",
+                subtitle = "Государственные праздники РФ",
+                onClick = { /*TODO*/ }
+            ) {
+                var checked by remember { mutableStateOf(true) }
+                Switch(
+                    checked = checked,
+                    onCheckedChange = { checked = it }
+                )
+            }
+
+            //раздел заметки
+            SectionHeader("Заметки")
+
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             SettingsItem(
                 icon = Icons.Default.Save,
                 title = "Сохранение данных",
                 subtitle = "Только в памяти — данные не сохраняются",
+<<<<<<< HEAD
                 onClick = {},
                 enabled = false
             )
 
             SectionHeader("О приложении")
+=======
+                onClick = { /*TODO: добавить DataStore или Room*/ },
+                enabled = false //пока не реализовано
+            )
+
+            //раздел о приложении
+            SectionHeader("О приложении")
+
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             SettingsItem(
                 icon = Icons.Default.Info,
                 title = "Версия",
                 subtitle = "1.0.0-dev",
+<<<<<<< HEAD
                 onClick = {}
             )
             SettingsItem(
@@ -304,10 +389,24 @@ fun SettingsScreen(onClose: () -> Unit) {
                 title = "Сообщить об ошибке",
                 subtitle = "Отправить лог и комментарий",
                 onClick = { showErrorReportDialog = true }
+=======
+                onClick = { }
+            )
+
+            SettingsItem(
+                icon = Icons.Default.BugReport,
+                title = "Сообщить об ошибке",
+                subtitle = "Открыть форму обратной связи",
+                onClick = { /*TODO*/ }
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
+<<<<<<< HEAD
+=======
+            //пасхалка: три быстрых клика на подпись открывают рулетку
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
@@ -318,9 +417,16 @@ fun SettingsScreen(onClose: () -> Unit) {
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                     modifier = Modifier.clickable(
                         interactionSource = remember { MutableInteractionSource() },
+<<<<<<< HEAD
                         indication = null
                     ) {
                         val now = System.currentTimeMillis()
+=======
+                        indication = null //убираем стандартную рябь
+                    ) {
+                        val now = System.currentTimeMillis()
+                        //если пауза больше 1.2с — сброс счётчика
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                         if (now - lastClickTime > 1200) secretClicks = 0
                         lastClickTime = now
                         secretClicks++
@@ -331,11 +437,16 @@ fun SettingsScreen(onClose: () -> Unit) {
                     }
                 )
             }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
+<<<<<<< HEAD
 private fun sendEmail(context: Context, recipient: String, subject: String, body: String) {
     val intent = Intent(Intent.ACTION_SENDTO).apply {
         data = Uri.parse("mailto:")
@@ -350,6 +461,9 @@ private fun sendEmail(context: Context, recipient: String, subject: String, body
     }
 }
 
+=======
+//заголовок раздела настроек
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 @Composable
 private fun SectionHeader(title: String) {
     Text(
@@ -362,6 +476,10 @@ private fun SectionHeader(title: String) {
     )
 }
 
+<<<<<<< HEAD
+=======
+//одна строка в списке настроек
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 @Composable
 private fun SettingsItem(
     icon: ImageVector,
@@ -369,7 +487,11 @@ private fun SettingsItem(
     subtitle: String? = null,
     onClick: () -> Unit,
     enabled: Boolean = true,
+<<<<<<< HEAD
     trailing: @Composable (() -> Unit)? = null
+=======
+    trailing: @Composable (() -> Unit)? = null //элемент справа: стрелка, свитч, чип
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 ) {
     Surface(
         modifier = Modifier
@@ -377,7 +499,13 @@ private fun SettingsItem(
             .clip(RoundedCornerShape(14.dp))
             .clickable(enabled = enabled, onClick = onClick),
         shape = RoundedCornerShape(14.dp),
+<<<<<<< HEAD
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (enabled) 0.5f else 0.25f)
+=======
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(
+            alpha = if (enabled) 0.5f else 0.25f //серее если недоступно
+        )
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     ) {
         Row(
             modifier = Modifier
@@ -386,6 +514,10 @@ private fun SettingsItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+<<<<<<< HEAD
+=======
+            //иконка в круглом фоне
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -402,12 +534,23 @@ private fun SettingsItem(
                     modifier = Modifier.size(20.dp)
                 )
             }
+<<<<<<< HEAD
+=======
+
+            //текст название и подпись
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
+<<<<<<< HEAD
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.4f)
+=======
+                    color = MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = if (enabled) 1f else 0.4f
+                    )
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                 )
                 if (subtitle != null) {
                     Text(
@@ -417,6 +560,11 @@ private fun SettingsItem(
                     )
                 }
             }
+<<<<<<< HEAD
+=======
+
+            //справа либо переданный элемент, либо стрелка по умолчанию
+>>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             if (trailing != null) {
                 trailing()
             } else {
