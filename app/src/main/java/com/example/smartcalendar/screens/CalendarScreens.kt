@@ -1,11 +1,22 @@
 package com.example.smartcalendar.screens
 
-<<<<<<< HEAD
 
-import androidx.compose.ui.graphics.Color
+import android.content.Context
+import android.util.Log
+import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.launch
+import com.example.smartcalendar.utils.ThemeManager
 
-=======
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
+
+
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+
+
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,81 +29,81 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.smartcalendar.ui.theme.NoteIndicator
-import com.example.smartcalendar.ui.theme.SmartCalendarTheme
-import com.example.smartcalendar.ui.theme.TodayColor
-import com.example.smartcalendar.ui.theme.TodayOnColor
+
+import com.example.smartcalendar.ui.theme.*
+
+
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-<<<<<<< HEAD
-
-=======
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
 private val WEEK_DAYS = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс") // заголовки столбцов
 
 @Composable
-fun CalendarScreen() {
-<<<<<<< HEAD
+fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
+
+
 
     var showSearchDialog by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf("") }
+    var searchQuery      by remember { mutableStateOf("") }
+    var showDayPicker    by remember { mutableStateOf(false) }
+    var pickedDay        by remember { mutableStateOf<Int?>(null) }
 
-    var currentDate by remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
+    var showHolidays by remember { mutableStateOf(true) }
+
     val notes = remember { mutableStateMapOf<String, MutableList<String>>() } // заметки в памяти
 
-    var managingDay by remember { mutableStateOf<Int?>(null) }
-    var showDayPicker by remember { mutableStateOf(false) }
-    var pickedDay by remember { mutableStateOf<Int?>(null) }
+    val scope = rememberCoroutineScope()
+    fun saveNotesToDataStore(context: Context) {
+        scope.launch {
+            val notesToSave = notes.mapValues { it.value.toList() }
+            Log.d("Calendar", "Сохраняем заметки: $notesToSave")
+            ThemeManager.saveNotes(context, notesToSave)
+        }
+    }
 
-    val today = LocalDate.now()
-    val daysInMonth = currentDate.lengthOfMonth()
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        ThemeManager.getNotesFlow(context).collect { savedNotes ->
+            Log.d("Calendar", "Загружено из DataStore: $savedNotes")
+            notes.clear()
+            savedNotes.forEach { (key, list) ->
+                notes[key] = list.toMutableList()
+            }
+        }
+    }
+
+    var managingDay by remember { mutableStateOf<Int?>(null) }
+    var currentDate by remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
+
+
+    val today          = LocalDate.now()
+    val daysInMonth    = currentDate.lengthOfMonth()
     val firstDayOfWeek = currentDate.dayOfWeek.value // 1=Пн, 7=Вс
-    val monthName = currentDate.format(DateTimeFormatter.ofPattern("LLLL yyyy", Locale("ru")))
+    val monthName      = currentDate.format(DateTimeFormatter.ofPattern("LLLL yyyy", Locale.forLanguageTag("ru")))
+
+
 
     val holidays = remember {
         mapOf(
-            // 1 января - Новый год
-            Pair(1, 1) to "НГ",
-            // 31 декабря - Новый год (подпись тоже "НГ")
+            Pair(1, 1)   to "НГ",   // новый год
             Pair(12, 31) to "НГ",
-            // 7 января - Рождество
-            Pair(1, 7) to "Рож",
-            // 23 февраля - День защитника Отечества
-            Pair(2, 23) to "23Ф",
-            // 8 марта - Международный женский день
-            Pair(3, 8) to "8М",
-            // 1 мая - Праздник Весны и Труда
-            Pair(5, 1) to "1М",
-            // 9 мая - День Победы
-            Pair(5, 9) to "9М",
-            // 12 июня - День России
-            Pair(6, 12) to "12И",
-            // 4 ноября - День народного единства
-            Pair(11, 4) to "4Н"
+            Pair(1, 7)   to "Рож",  // рождество
+            Pair(2, 23)  to "23Ф",  // день защитника
+            Pair(3, 8)   to "8М",   // женский день
+            Pair(5, 1)   to "1М",   // праздник труда
+            Pair(5, 9)   to "9М",   // день победы
+            Pair(6, 12)  to "12И",  // день россии
+            Pair(11, 4)  to "4Н"    // день народного единства
         )
     }
-=======
-    var showAddDialog by remember { mutableStateOf(false) }
-    var tempDay       by remember { mutableStateOf<Int?>(null) }
-    var viewDay       by remember { mutableStateOf<Int?>(null) }
-    var currentDate   by remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
-    var selectedDay   by remember { mutableStateOf<Int?>(null) }
-    var noteInput     by remember { mutableStateOf("") }
-    val notes         = remember { mutableStateMapOf<String, String>() } // заметки в памяти
-
-    val today         = LocalDate.now()
-    val daysInMonth   = currentDate.lengthOfMonth()
-    val firstDayOfWeek = currentDate.dayOfWeek.value // 1=Пн, 7=Вс
-    val monthName     = currentDate.format(DateTimeFormatter.ofPattern("LLLL yyyy", Locale("ru")))
-    val totalCells    = (firstDayOfWeek - 1) + daysInMonth // всего ячеек в сетке
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
 
     Column(
         modifier = Modifier
@@ -101,14 +112,13 @@ fun CalendarScreen() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // навигация: стрелки + название месяца
+        // навигация: стрелки + название месяца + поиск + настройки
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
-<<<<<<< HEAD
         ) {
             Button(
                 onClick = { currentDate = currentDate.minusMonths(1) },
@@ -130,92 +140,24 @@ fun CalendarScreen() {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 TextButton(onClick = { showSearchDialog = true }) {
-                    Text("Поиск заметок", fontSize = 20.sp)
-=======
-        ) {
-            Button(
-                onClick = { currentDate = currentDate.minusMonths(1) },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text("‹", fontSize = 22.sp, color = MaterialTheme.colorScheme.primary)
-            }
-
-            Text(
-                text = monthName.replaceFirstChar { it.uppercase() },
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold),
-                color = MaterialTheme.colorScheme.onBackground
-            )
-
-            Button(
-                onClick = { currentDate = currentDate.plusMonths(1) },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text("›", fontSize = 22.sp, color = MaterialTheme.colorScheme.primary)
-            }
-        }
-
-        // заголовки дней недели
-        Row(modifier = Modifier.fillMaxWidth()) {
-            WEEK_DAYS.forEach { day ->
-                Text(
-                    text = day,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center,
-                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // сетка дней
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(7),
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f), // растягивается на всё свободное место
-            userScrollEnabled = false
-        ) {
-            items(firstDayOfWeek - 1) { // пустые ячейки до первого числа
-                Box(modifier = Modifier.aspectRatio(1f))
-            }
-
-            items(daysInMonth) { index ->
-                val day = index + 1
-                val isToday = currentDate.year == today.year
-                        && currentDate.monthValue == today.monthValue
-                        && day == today.dayOfMonth
-                val key = "${currentDate.year}-${currentDate.monthValue}-$day"
-
-                DayCell(
-                    day     = day,
-                    isToday = isToday,
-                    hasNote = notes[key] != null,
-                    onClick = { viewDay = day }
-                )
-            }
-
-            val remainder = totalCells % 7
-            if (remainder != 0) { // выравнивающие ячейки в конце строки
-                items(7 - remainder) {
-                    Box(modifier = Modifier.aspectRatio(1f))
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
+                    Text("🔍", fontSize = 20.sp)
                 }
             }
 
-            Button(
-                onClick = { currentDate = currentDate.plusMonths(1) },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text("›", fontSize = 22.sp, color = MaterialTheme.colorScheme.primary)
+            Row {
+                Button(
+                    onClick = { currentDate = currentDate.plusMonths(1) },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("›", fontSize = 22.sp, color = MaterialTheme.colorScheme.primary)
+                }
+                IconButton(onClick = onOpenSettings) {
+                    Icon(Icons.Default.Settings, contentDescription = "настройки")
+                }
             }
         }
 
-<<<<<<< HEAD
         // заголовки дней недели
         Row(modifier = Modifier.fillMaxWidth()) {
             WEEK_DAYS.forEach { day ->
@@ -239,74 +181,50 @@ fun CalendarScreen() {
                 .weight(1f), // растягивается на всё свободное место
             userScrollEnabled = false
         ) {
-
             val prevMonth = currentDate.minusMonths(1)
             val nextMonth = currentDate.plusMonths(1)
 
-// Дни предыдущего месяца, которые попадают в сетку
-            val daysFromPrevMonth = (firstDayOfWeek - 1).let { offset ->
-                if (offset > 0) {
-                    val daysInPrev = prevMonth.lengthOfMonth()
-                    (daysInPrev - offset + 1..daysInPrev).map { it }
-                } else emptyList()
-            }
+            // дни предыдущего месяца для заполнения начала сетки
+            val daysFromPrevMonth = if (firstDayOfWeek > 1) {
+                val daysInPrev = prevMonth.lengthOfMonth()
+                (daysInPrev - (firstDayOfWeek - 2)..daysInPrev).toList()
+            } else emptyList()
 
-// Дни текущего месяца
             val daysFromCurrentMonth = (1..daysInMonth).toList()
 
-// Сколько дней следующего месяца нужно, чтобы заполнить 42 ячейки (6 строк × 7 дней)
-            val totalCellsNeeded = 42
+            // дни следующего месяца для заполнения до 42 ячеек
             val filledCount = daysFromPrevMonth.size + daysFromCurrentMonth.size
-            val daysFromNextMonth = (1..(totalCellsNeeded - filledCount)).toList()
+            val daysFromNextMonth = (1..(42 - filledCount)).toList()
 
-            // Собираем все дни с флагом "isCurrentMonth"
             data class CalendarDay(val day: Int, val monthValue: Int, val year: Int, val isCurrentMonth: Boolean)
 
-            val allDays = mutableListOf<CalendarDay>()
-
-            daysFromPrevMonth.forEach { day ->
-                allDays.add(CalendarDay(day, prevMonth.monthValue, prevMonth.year, false))
-            }
-            daysFromCurrentMonth.forEach { day ->
-                allDays.add(CalendarDay(day, currentDate.monthValue, currentDate.year, true))
-            }
-            daysFromNextMonth.forEach { day ->
-                allDays.add(CalendarDay(day, nextMonth.monthValue, nextMonth.year, false))
+            val allDays = buildList {
+                daysFromPrevMonth.forEach { add(CalendarDay(it, prevMonth.monthValue, prevMonth.year, false)) }
+                daysFromCurrentMonth.forEach { add(CalendarDay(it, currentDate.monthValue, currentDate.year, true)) }
+                daysFromNextMonth.forEach { add(CalendarDay(it, nextMonth.monthValue, nextMonth.year, false)) }
             }
 
-// Отображаем все 42 ячейки
             items(allDays.size) { index ->
                 val calDay = allDays[index]
-                val day = calDay.day
                 val isToday = calDay.isCurrentMonth &&
                         calDay.year == today.year &&
                         calDay.monthValue == today.monthValue &&
-                        day == today.dayOfMonth
-
-                val key = if (calDay.isCurrentMonth) {
-                    "${currentDate.year}-${currentDate.monthValue}-$day"
-                } else null
-
+                        calDay.day == today.dayOfMonth
+                val key = "${calDay.year}-${calDay.monthValue}-${calDay.day}"
                 val holiday = holidays[Pair(calDay.monthValue, calDay.day)]
 
                 if (calDay.isCurrentMonth) {
                     DayCell(
-                        day = day,
-                        isToday = isToday,
-                        hasNote = notes[key]?.isNotEmpty() == true,
-                        onClick = { managingDay = day },
-                        holidayName = holiday
+                        day         = calDay.day,
+                        isToday     = isToday,
+                        hasNote     = notes[key]?.isNotEmpty() == true,
+                        onClick     = { managingDay = calDay.day },
+                        holidayName = if (showHolidays) holiday else null
                     )
                 } else {
-                    InactiveDayCell(
-                        day = day,
-                        isToday = false,
-                        holidayName = holiday
-                    )
+                    InactiveDayCell(day = calDay.day, holidayName = if (showHolidays) holiday else null)
                 }
             }
-
-
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -314,20 +232,11 @@ fun CalendarScreen() {
         // кнопка добавления заметки
         Button(
             onClick = { showDayPicker = true },
-=======
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // кнопка добавления заметки
-        Button(
-            onClick = { showAddDialog = true },
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
             shape = RoundedCornerShape(14.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary
-            )
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
         ) {
             Text(
                 text = "+ Добавить заметку",
@@ -338,7 +247,7 @@ fun CalendarScreen() {
         Spacer(modifier = Modifier.height(16.dp))
     }
 
-<<<<<<< HEAD
+    // диалог выбора дня
     if (showDayPicker) {
         AlertDialog(
             onDismissRequest = { showDayPicker = false; pickedDay = null },
@@ -347,23 +256,11 @@ fun CalendarScreen() {
                 OutlinedTextField(
                     value = pickedDay?.toString() ?: "",
                     onValueChange = { pickedDay = it.toIntOrNull() },
-=======
-    // диалог выбора дня
-    if (showAddDialog) {
-        AlertDialog(
-            onDismissRequest = { showAddDialog = false; tempDay = null },
-            title = { Text("Выберите день") },
-            text = {
-                OutlinedTextField(
-                    value = tempDay?.toString() ?: "",
-                    onValueChange = { tempDay = it.toIntOrNull() },
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
                     label = { Text("День от 1 до $daysInMonth") },
                     singleLine = true
                 )
             },
             confirmButton = {
-<<<<<<< HEAD
                 TextButton(onClick = {
                     if (pickedDay != null && pickedDay!! in 1..daysInMonth) {
                         managingDay = pickedDay
@@ -374,30 +271,13 @@ fun CalendarScreen() {
             },
             dismissButton = {
                 TextButton(onClick = { showDayPicker = false; pickedDay = null }) { Text("Отмена") }
-=======
-                TextButton(
-                    onClick = {
-                        if (tempDay != null && tempDay!! in 1..daysInMonth) {
-                            val key = "${currentDate.year}-${currentDate.monthValue}-$tempDay"
-                            noteInput = notes[key] ?: ""
-                            selectedDay = tempDay
-                            showAddDialog = false
-                            tempDay = null
-                        }
-                    }
-                ) { Text("Далее") }
-            },
-            dismissButton = {
-                TextButton(onClick = { showAddDialog = false; tempDay = null }) { Text("Отмена") }
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
             }
         )
     }
 
-<<<<<<< HEAD
-// диалог управления заметками (добавление/удаление/просмотр)
+    // диалог управления заметками дня
     if (managingDay != null) {
-        val dateKey = "${currentDate.year}-${currentDate.monthValue}-${managingDay!!}"
+        val dateKey  = "${currentDate.year}-${currentDate.monthValue}-${managingDay!!}"
         val dayNotes = notes[dateKey] ?: mutableListOf()
         var newNoteText by remember { mutableStateOf("") }
 
@@ -406,7 +286,7 @@ fun CalendarScreen() {
             title = { Text("Заметки на $managingDay ${monthName.replaceFirstChar { it.uppercase() }}") },
             text = {
                 Column {
-                    // список существующих заметок
+                    // список существующих заметок с кнопкой удаления
                     dayNotes.forEachIndexed { idx, note ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -418,6 +298,7 @@ fun CalendarScreen() {
                                 val updated = dayNotes.toMutableList().apply { removeAt(idx) }
                                 if (updated.isEmpty()) notes.remove(dateKey)
                                 else notes[dateKey] = updated
+                                saveNotesToDataStore(context)   // <-- добавить
                             }) {
                                 Text("Удалить", color = MaterialTheme.colorScheme.error)
                             }
@@ -425,7 +306,7 @@ fun CalendarScreen() {
                         Spacer(modifier = Modifier.height(4.dp))
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    // поле для новой заметки
+                    // поле новой заметки
                     OutlinedTextField(
                         value = newNoteText,
                         onValueChange = { newNoteText = it },
@@ -436,45 +317,37 @@ fun CalendarScreen() {
                     Button(
                         onClick = {
                             if (newNoteText.isNotBlank()) {
-                                val currentList = notes[dateKey] ?: mutableListOf()
-                                currentList.add(newNoteText)
-                                notes[dateKey] = currentList
+                                val list = notes.getOrPut(dateKey) { mutableListOf() }
+                                list.add(newNoteText)
+                                saveNotesToDataStore(context)   // <-- добавили context
                                 newNoteText = ""
                             }
                         },
                         modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text("Добавить")
-                    }
+                    ) { Text("Добавить") }
                 }
             },
             confirmButton = {
                 TextButton(onClick = { managingDay = null }) { Text("Готово") }
             }
         )
-
     }
 
-    // Диалог поиска заметок — теперь снаружи, на одном уровне
+    // диалог поиска заметок
     if (showSearchDialog) {
         var results by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
 
         LaunchedEffect(searchQuery) {
-            if (searchQuery.isNotBlank()) {
-                results = notes.flatMap { (dateKey, notesList) ->
-                    notesList.filter { note -> note.contains(searchQuery, ignoreCase = true) }
-                        .map { note -> dateKey to note }
+            results = if (searchQuery.isNotBlank()) {
+                notes.flatMap { (dateKey, list) ->
+                    list.filter { it.contains(searchQuery, ignoreCase = true) }
+                        .map { dateKey to it }
                 }
-            } else {
-                results = emptyList()
-            }
+            } else emptyList()
         }
 
         AlertDialog(
-            onDismissRequest = {
-                showSearchDialog = false
-                searchQuery = ""
-            },
+            onDismissRequest = { showSearchDialog = false; searchQuery = "" },
             title = { Text("Поиск заметок") },
             text = {
                 Column {
@@ -490,136 +363,57 @@ fun CalendarScreen() {
                         if (results.isEmpty()) {
                             Text("Ничего не найдено")
                         } else {
-                            Column {
-                                results.forEach { (dateKey, noteText) ->
-                                    val parts = dateKey.split("-")
-                                    val year = parts[0].toInt()
-                                    val month = parts[1].toInt()
-                                    val day = parts[2].toInt()
-                                    val date = LocalDate.of(year, month, day)
-                                    val formattedDate = date.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("ru")))
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .clickable {
-                                                showSearchDialog = false
-                                                searchQuery = ""
-                                                currentDate = LocalDate.of(year, month, 1)
-                                                managingDay = day
-                                            }
-                                            .padding(vertical = 8.dp),
-                                        horizontalArrangement = Arrangement.SpaceBetween
-                                    ) {
-                                        Column(modifier = Modifier.weight(1f)) {
-                                            Text(text = noteText, fontWeight = FontWeight.Medium)
-                                            Text(text = formattedDate, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
+                            results.forEach { (dateKey, noteText) ->
+                                val parts = dateKey.split("-")
+                                val date  = LocalDate.of(parts[0].toInt(), parts[1].toInt(), parts[2].toInt())
+                                val formatted = date.format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru")))
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable {
+                                            showSearchDialog = false
+                                            searchQuery = ""
+                                            currentDate = date.withDayOfMonth(1)
+                                            managingDay = date.dayOfMonth
                                         }
+                                        .padding(vertical = 8.dp)
+                                ) {
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(text = noteText, fontWeight = FontWeight.Medium)
+                                        Text(text = formatted, fontSize = 12.sp, color = MaterialTheme.colorScheme.primary)
                                     }
-                                    Divider()
                                 }
+                                HorizontalDivider()
                             }
                         }
                     }
                 }
             },
             confirmButton = {
-                TextButton(onClick = { showSearchDialog = false; searchQuery = "" }) {
-                    Text("Закрыть")
-                }
-            }
-        )
-    }
-
-}
-
-// ячейка одного дня
-
-=======
-    // диалог ввода заметки
-    if (selectedDay != null) {
-        AlertDialog(
-            onDismissRequest = { selectedDay = null },
-            title = { Text("Заметка для $selectedDay ${monthName.replaceFirstChar { it.uppercase() }}") },
-            text = {
-                OutlinedTextField(
-                    value = noteInput,
-                    onValueChange = { noteInput = it },
-                    label = { Text("Текст заметки") },
-                    minLines = 3
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        if (noteInput.isNotBlank()) {
-                            val key = "${currentDate.year}-${currentDate.monthValue}-${selectedDay!!}"
-                            notes[key] = noteInput // сохраняем заметку
-                        }
-                        selectedDay = null
-                        noteInput = ""
-                    }
-                ) { Text("Сохранить") }
-            },
-            dismissButton = {
-                TextButton(onClick = { selectedDay = null; noteInput = "" }) { Text("Отмена") }
-            }
-        )
-    }
-
-    // диалог просмотра заметки
-    if (viewDay != null) {
-        val key = "${currentDate.year}-${currentDate.monthValue}-$viewDay"
-        AlertDialog(
-            onDismissRequest = { viewDay = null },
-            title = { Text("$viewDay ${monthName.replaceFirstChar { it.uppercase() }}") },
-            text = {
-                Text(
-                    text = notes[key] ?: "Нет заметки",
-                    color = if (notes[key] != null)
-                        MaterialTheme.colorScheme.onSurface
-                    else
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            },
-            confirmButton = {
-                if (notes[key] != null) {
-                    TextButton(onClick = {
-                        noteInput = notes[key] ?: ""
-                        selectedDay = viewDay
-                        viewDay = null
-                    }) { Text("Изменить") }
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { viewDay = null }) { Text("Закрыть") }
+                TextButton(onClick = { showSearchDialog = false; searchQuery = "" }) { Text("Закрыть") }
             }
         )
     }
 }
 
-// ячейка одного дня
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
+// ячейка текущего месяца
 @Composable
 fun DayCell(
     day: Int,
     isToday: Boolean,
     hasNote: Boolean,
-<<<<<<< HEAD
     onClick: () -> Unit,
-    holidayName: String? = null   // <-- добавить эту строку
+    holidayName: String? = null
 ) {
-    // Определяем цвет фона: если праздник – жёлтый, иначе стандартный
+    // Цвет фона: праздник → жёлтый, сегодня → цвет todayColor из темы, иначе primaryContainer
     val bgColor = when {
         holidayName != null -> Color.Yellow
-        isToday -> TodayColor
+        isToday -> MaterialTheme.colorScheme.todayColor
         else -> MaterialTheme.colorScheme.primaryContainer
     }
-=======
-    onClick: () -> Unit
-) {
-    val bgColor  = if (isToday) TodayColor else MaterialTheme.colorScheme.primaryContainer // фон ячейки
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
-    val txtColor = if (isToday) TodayOnColor else MaterialTheme.colorScheme.onPrimaryContainer
+    // Цвет текста: сегодня → onPrimaryContainer, иначе onPrimaryContainer (можно и onPrimary)
+    val txtColor = if (isToday) MaterialTheme.colorScheme.onPrimaryContainer
+    else MaterialTheme.colorScheme.onPrimaryContainer
 
     Box(
         modifier = Modifier
@@ -640,20 +434,18 @@ fun DayCell(
                 fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
                 color = txtColor
             )
-<<<<<<< HEAD
             if (hasNote) {
-=======
-            if (hasNote) { // точка-индикатор заметки
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
+                // Точка-индикатор: цвет зависит от темы
                 Box(
                     modifier = Modifier
                         .size(5.dp)
                         .clip(CircleShape)
-                        .background(if (isToday) TodayOnColor else NoteIndicator)
+                        .background(
+                            if (isToday) MaterialTheme.colorScheme.onPrimaryContainer
+                            else MaterialTheme.colorScheme.noteIndicator
+                        )
                 )
             }
-<<<<<<< HEAD
-            // Отображаем подпись праздника под цифрой
             if (holidayName != null) {
                 Text(
                     text = holidayName,
@@ -666,14 +458,13 @@ fun DayCell(
     }
 }
 
+// ячейка соседнего месяца (серая, некликабельная)
 @Composable
 fun InactiveDayCell(
     day: Int,
-    isToday: Boolean,
-    holidayName: String? = null   // <-- добавить
+    holidayName: String? = null
 ) {
-    // Фон: если праздник – жёлтый, иначе полупрозрачный серый
-    val bgColor = if (holidayName != null) Color.Yellow
+    val bgColor  = if (holidayName != null) Color.Yellow
     else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
     val txtColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
 
@@ -689,12 +480,7 @@ fun InactiveDayCell(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(
-                text = "$day",
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Normal,
-                color = txtColor
-            )
+            Text(text = "$day", fontSize = 15.sp, color = txtColor)
             if (holidayName != null) {
                 Text(
                     text = holidayName,
@@ -703,8 +489,6 @@ fun InactiveDayCell(
                     color = txtColor.copy(alpha = 0.8f)
                 )
             }
-=======
->>>>>>> a53790ad5b14962ed9121a07047666dab4a667d2
         }
     }
 }

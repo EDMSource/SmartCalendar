@@ -7,23 +7,44 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import com.example.smartcalendar.screens.CalendarScreen
+import com.example.smartcalendar.screens.SettingsScreen
 import com.example.smartcalendar.ui.theme.SmartCalendarTheme
+import com.example.smartcalendar.utils.ThemeManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            var currentThemeId by remember { mutableStateOf("default") }
+            LaunchedEffect(Unit) {
+                ThemeManager.getCurrentThemeFlow(this@MainActivity).collect { newId ->
+                    currentThemeId = newId
+                }
+            }
             SmartCalendarTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    CalendarScreen()
+                    key(currentThemeId) {
+                        AppContent()
+                    }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun AppContent() {
+    var showSettings by remember { mutableStateOf(false) }
+    if (showSettings) {
+        SettingsScreen(onClose = { showSettings = false })
+    } else {
+        CalendarScreen(onOpenSettings = { showSettings = true })
     }
 }
