@@ -1,15 +1,6 @@
 package com.example.smartcalendar.roulette
 
-<<<<<<< HEAD
-
-
-
-
 import android.util.Log
-
-
-
-
 
 import com.example.smartcalendar.utils.ThemeManager
 
@@ -18,8 +9,6 @@ import com.example.smartcalendar.utils.LogCollector
 import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 
-=======
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -43,14 +32,12 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 import kotlin.random.Random
 
-//данные одной награды
 private data class Reward(
     val name: String,
     val emoji: String,
     val color: Color
 )
 
-//список всех наград
 private val rewards = listOf(
     Reward("Мятный градиент",   "🌿", Color(0xFF4CAF93)),
     Reward("Песочный фон",      "🏜️", Color(0xFFD4A96A)),
@@ -73,19 +60,15 @@ private val rewards = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RouletteScreen(onClose: () -> Unit) {
-<<<<<<< HEAD
 
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
 
-=======
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     var isSpinning by remember { mutableStateOf(false) }
-    var result by remember { mutableStateOf<Reward?>(null) } //null пока не крутили
+    var result by remember { mutableStateOf<Reward?>(null) }
     var spinCount by remember { mutableStateOf(0) }
-    var shownIndex by remember { mutableStateOf(0) } //текущий индекс при прокрутке
+    var shownIndex by remember { mutableStateOf(0) }
 
-    //бесконечная анимация вращения (0 -> 360 по кругу)
     val infiniteTransition = rememberInfiniteTransition(label = "spin")
     val rotation by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -96,19 +79,16 @@ fun RouletteScreen(onClose: () -> Unit) {
         label = "rotation"
     )
 
-    //запускается когда isSpinning меняется на true
     LaunchedEffect(isSpinning) {
         if (!isSpinning) return@LaunchedEffect
 
-        val totalTicks = 20 + Random.nextInt(15) //случайное кол-во шагов
+        val totalTicks = 20 + Random.nextInt(15)
         repeat(totalTicks) { tick ->
             shownIndex = (shownIndex + 1) % rewards.size
-            //в конце замедляемся: задержка растёт
             val pause = if (tick < totalTicks - 5) 80L else 80L + tick * 20L
             delay(pause)
         }
 
-<<<<<<< HEAD
         val wonReward = rewards[shownIndex]
         result = wonReward
         Log.d("Roulette", "Выиграна награда: ${wonReward.name}")
@@ -127,12 +107,6 @@ fun RouletteScreen(onClose: () -> Unit) {
         }
         isSpinning = false
         spinCount++
-
-=======
-        result = rewards[shownIndex] //фиксируем итоговую награду
-        isSpinning = false
-        spinCount++
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     }
 
     Scaffold(
@@ -157,7 +131,6 @@ fun RouletteScreen(onClose: () -> Unit) {
         ) {
             Spacer(modifier = Modifier.height(8.dp))
 
-            //круглый барабан
             Box(
                 modifier = Modifier
                     .size(220.dp)
@@ -186,7 +159,6 @@ fun RouletteScreen(onClose: () -> Unit) {
             ) {
                 when {
                     isSpinning -> {
-                        //во время прокрутки: emoji крутится
                         Text(
                             text = rewards[shownIndex].emoji,
                             fontSize = 64.sp,
@@ -194,7 +166,6 @@ fun RouletteScreen(onClose: () -> Unit) {
                         )
                     }
                     result != null -> {
-                        //результат: emoji + название
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.padding(16.dp)
@@ -211,13 +182,11 @@ fun RouletteScreen(onClose: () -> Unit) {
                         }
                     }
                     else -> {
-                        //начальное состояние до первого спина
                         Text(text = "🎰", fontSize = 72.sp)
                     }
                 }
             }
 
-            //информационная плашка под барабаном
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -243,9 +212,8 @@ fun RouletteScreen(onClose: () -> Unit) {
                             text = result!!.name,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = result!!.color //цвет самой награды
+                            color = result!!.color
                         )
-                        //счётчик показываем только со второго спина
                         if (spinCount > 1) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
@@ -266,7 +234,6 @@ fun RouletteScreen(onClose: () -> Unit) {
 
             Spacer(modifier = Modifier.weight(1f))
 
-            //кнопка запуска
             Button(
                 onClick = {
                     result = null

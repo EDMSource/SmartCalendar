@@ -4,32 +4,20 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import com.example.smartcalendar.utils.ThemeManager
-import kotlinx.coroutines.flow.first
+
+private val LocalTodayColor = staticCompositionLocalOf { Color.Unspecified }
+private val LocalNoteIndicator = staticCompositionLocalOf { Color.Unspecified }
 
 @Composable
 fun SmartCalendarTheme(
+    themeId: String = "default",
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val context = LocalContext.current
-    var darkModePref by remember { mutableStateOf(false) }
-    var currentThemeId by remember { mutableStateOf("default") }
+    val theme = ThemeManager.getThemeById(themeId)
 
-    LaunchedEffect(Unit) {
-        darkModePref = ThemeManager.getDarkModeFlow(context).first()
-        ThemeManager.getDarkModeFlow(context).collect { darkModePref = it }
-    }
-    LaunchedEffect(Unit) {
-        currentThemeId = ThemeManager.getCurrentThemeFlow(context).first()
-        ThemeManager.getCurrentThemeFlow(context).collect { currentThemeId = it }
-    }
-
-    val useDarkTheme = darkModePref
-    val theme = ThemeManager.getThemeById(currentThemeId)
-
-    val colorScheme = if (useDarkTheme) {
+    val colorScheme = if (darkTheme) {
         darkColorScheme(
             primary = theme.primary,
             primaryContainer = theme.primaryContainer.copy(alpha = 0.8f),
@@ -45,34 +33,22 @@ fun SmartCalendarTheme(
         )
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography(),
-        content = content
-    )
+    CompositionLocalProvider(
+        LocalTodayColor provides theme.todayColor,
+        LocalNoteIndicator provides theme.noteIndicator
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography(),
+            content = content
+        )
+    }
 }
 
-// Extension properties для ColorScheme
 val ColorScheme.todayColor: Color
     @Composable
-    get() {
-        val context = LocalContext.current
-        var themeId by remember { mutableStateOf("default") }
-        LaunchedEffect(Unit) {
-            themeId = ThemeManager.getCurrentThemeFlow(context).first()
-            ThemeManager.getCurrentThemeFlow(context).collect { themeId = it }
-        }
-        return ThemeManager.getThemeById(themeId).todayColor
-    }
+    get() = LocalTodayColor.current
 
 val ColorScheme.noteIndicator: Color
     @Composable
-    get() {
-        val context = LocalContext.current
-        var themeId by remember { mutableStateOf("default") }
-        LaunchedEffect(Unit) {
-            themeId = ThemeManager.getCurrentThemeFlow(context).first()
-            ThemeManager.getCurrentThemeFlow(context).collect { themeId = it }
-        }
-        return ThemeManager.getThemeById(themeId).noteIndicator
-    }
+    get() = LocalNoteIndicator.current

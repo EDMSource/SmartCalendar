@@ -1,24 +1,5 @@
 package com.example.smartcalendar.screens
 
-<<<<<<< HEAD
-
-
-import androidx.compose.foundation.background
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.foundation.rememberScrollState
-
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.graphics.Color
-
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
-import android.widget.Toast
-
-
-import android.util.Log
-=======
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -35,32 +16,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-<<<<<<< HEAD
 import androidx.compose.ui.platform.LocalContext
-=======
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.util.Log
 import com.example.smartcalendar.roulette.RouletteScreen
-<<<<<<< HEAD
 import com.example.smartcalendar.utils.ThemeManager
-
 import com.example.smartcalendar.utils.LogCollector
-
+import com.example.smartcalendar.utils.CloudflareReporter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-
-
-private const val REPORT_EMAIL = "your-email@example.com"   // замените на реальный email
-=======
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(onClose: () -> Unit) {
-<<<<<<< HEAD
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
@@ -75,34 +49,30 @@ fun SettingsScreen(onClose: () -> Unit) {
     LaunchedEffect(Unit) {
         launch {
             ThemeManager.getDarkModeFlow(context).collect {
-                darkMode = it; Log.d(
-                "Settings",
-                "darkMode = $it"
-            ); LogCollector.addLog("Settings", "darkMode = $it")
+                darkMode = it
+                Log.d("Settings", "darkMode = $it")
+                LogCollector.addLog("Settings", "darkMode = $it")
             }
         }
         launch {
             ThemeManager.getCurrentThemeFlow(context).collect {
-                currentThemeId = it; Log.d(
-                "Settings",
-                "currentThemeId = $it"
-            ); LogCollector.addLog("Settings", "currentThemeId = $it")
+                currentThemeId = it
+                Log.d("Settings", "currentThemeId = $it")
+                LogCollector.addLog("Settings", "currentThemeId = $it")
             }
         }
         launch {
             ThemeManager.getUnlockedThemesFlow(context).collect {
-                unlockedThemes = it; Log.d(
-                "Settings",
-                "unlockedThemes = $it"
-            ); LogCollector.addLog("Settings", "unlockedThemes = $it")
+                unlockedThemes = it
+                Log.d("Settings", "unlockedThemes = $it")
+                LogCollector.addLog("Settings", "unlockedThemes = $it")
             }
         }
         launch {
             ThemeManager.getShowHolidaysFlow(context).collect {
-                showHolidays = it; Log.d(
-                "Settings",
-                "showHolidays = $it"
-            ); LogCollector.addLog("Settings", "showHolidays = $it")
+                showHolidays = it
+                Log.d("Settings", "showHolidays = $it")
+                LogCollector.addLog("Settings", "showHolidays = $it")
             }
         }
     }
@@ -117,113 +87,169 @@ fun SettingsScreen(onClose: () -> Unit) {
             scope.launch {
                 val fresh = ThemeManager.getUnlockedThemesFlow(context).first()
                 unlockedThemes = fresh
-                Log.d("Settings", "Обновлено после рулетки: $fresh")
+                Log.d("Settings", "обновлено после рулетки: $fresh")
             }
         })
         return
     }
 
     if (showErrorReportDialog) {
+        var isSending by remember { mutableStateOf(false) }
+        var sendResult by remember { mutableStateOf<String?>(null) }
+        val logsCount = LogCollector.getLogs().split("\n").filter { it.isNotBlank() }.size
+
         AlertDialog(
-            onDismissRequest = { showErrorReportDialog = false; errorReportText = "" },
-            title = { Text("Сообщить об ошибке") },
+            onDismissRequest = {
+                if (!isSending) {
+                    showErrorReportDialog = false
+                    errorReportText = ""
+                    sendResult = null
+                }
+            },
+            title = { Text("сообщить об ошибке") },
             text = {
                 Column {
-                    Text(
-                        "Отправляется на почту: $REPORT_EMAIL",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Опишите проблему:")
+                    if (sendResult != null) {
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (sendResult == "отправлено! спасибо!")
+                                Color(0xFF4CAF50).copy(alpha = 0.15f)
+                            else
+                                Color(0xFFF44336).copy(alpha = 0.15f)
+                        ) {
+                            Text(
+                                text = sendResult!!,
+                                modifier = Modifier.padding(12.dp),
+                                color = if (sendResult == "отправлено! спасибо!")
+                                    Color(0xFF4CAF50)
+                                else
+                                    Color(0xFFF44336)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp),
+                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                    ) {
+                        Text(
+                            text = "отправляется анонимно в telegram\nлоги будут отправлены файлом .txt",
+                            fontSize = 12.sp,
+                            modifier = Modifier.padding(10.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text("опишите проблему (необязательно):")
                     Spacer(modifier = Modifier.height(4.dp))
+
                     OutlinedTextField(
                         value = errorReportText,
                         onValueChange = { errorReportText = it },
-                        label = { Text("Ваш комментарий") },
+                        label = { Text("что случилось?") },
                         minLines = 2,
+                        enabled = !isSending,
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Логи приложения:", fontWeight = FontWeight.Bold, fontSize = 12.sp)
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp)
-                            .background(
-                                MaterialTheme.colorScheme.surfaceVariant,
-                                RoundedCornerShape(8.dp)
-                            )
-                            .padding(8.dp)
-                            .verticalScroll(rememberScrollState())
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        val logs = LogCollector.getLogs()
-                        if (logs.isEmpty()) {
-                            Text("Логи отсутствуют", fontSize = 10.sp, color = Color.Gray)
-                        } else {
-                            Text(
-                                text = logs,
-                                fontSize = 9.sp,
-                                fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
+                        Text("логов в файле: $logsCount", fontSize = 12.sp)
+                        Text("формат: .txt", fontSize = 12.sp)
                     }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Text(
+                        "файл будет отправлен в telegram после нажатия кнопки",
+                        fontSize = 10.sp,
+                        color = Color.Gray
+                    )
                 }
             },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        val logs = LogCollector.getLogs()
-                        val fullMessage = """
-                        Комментарий пользователя:
-                        $errorReportText
-                        
-                        Логи приложения:
-                        $logs
-                    """.trimIndent()
-                        sendEmail(
-                            context,
-                            REPORT_EMAIL,
-                            "Отчёт об ошибке SmartCalendar",
-                            fullMessage
-                        )
+                if (!isSending && sendResult == null) {
+                    Button(
+                        onClick = {
+                            isSending = true
+                            scope.launch {
+                                //экспортируем логи в файл
+                                val logFile = LogCollector.exportLogsToFile(context)
+
+                                val result = CloudflareReporter.sendBugReport(
+                                    context = context,
+                                    comment = errorReportText,
+                                    logFile = logFile
+                                )
+                                sendResult = when (result) {
+                                    is CloudflareReporter.ReportResult.Success -> "отправлено! спасибо!"
+                                    is CloudflareReporter.ReportResult.Error -> "ошибка: ${result.message}"
+                                }
+                                isSending = false
+
+                                delay(2000)
+                                if (sendResult == "отправлено! спасибо!") {
+                                    showErrorReportDialog = false
+                                    errorReportText = ""
+                                    sendResult = null
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isSending
+                    ) {
+                        if (isSending) {
+                            Row(horizontalArrangement = Arrangement.Center) {
+                                Text("отправка...")
+                                Spacer(modifier = Modifier.width(8.dp))
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(16.dp),
+                                    strokeWidth = 2.dp
+                                )
+                            }
+                        } else {
+                            Text("отправить файл с логами")
+                        }
+                    }
+                } else if (sendResult == "отправлено! спасибо!") {
+                    TextButton(onClick = {
                         showErrorReportDialog = false
                         errorReportText = ""
+                        sendResult = null
+                    }) {
+                        Text("закрыть")
                     }
-                ) {
-                    Text("Отправить")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showErrorReportDialog = false; errorReportText = "" }) {
-                    Text("Отмена")
+                if (!isSending && sendResult == null) {
+                    TextButton(onClick = {
+                        showErrorReportDialog = false
+                        errorReportText = ""
+                        sendResult = null
+                    }) {
+                        Text("отмена")
+                    }
                 }
             }
         )
     }
 
-
-=======
-    var showRoulette by remember { mutableStateOf(false) }
-    var secretClicks by remember { mutableStateOf(0) } //счётчик тайных кликов
-    var lastClickTime by remember { mutableStateOf(0L) } //время последнего клика
-
-    //если открыли рулетку - показываем её вместо настроек
-    if (showRoulette) {
-        RouletteScreen(onClose = { showRoulette = false })
-        return
-    }
-
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Настройки", fontWeight = FontWeight.SemiBold) },
+                title = { Text("настройки", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onClose) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "назад")
                     }
                 }
             )
@@ -237,23 +263,20 @@ fun SettingsScreen(onClose: () -> Unit) {
                 .padding(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-<<<<<<< HEAD
-            SectionHeader("Внешний вид")
+            SectionHeader("внешний вид")
 
             SettingsItem(
                 icon = Icons.Default.Brightness6,
-                title = "Тёмная тема",
-                subtitle = if (darkMode) "Включена" else "Выключена",
+                title = "тёмная тема",
+                subtitle = if (darkMode) "включена" else "выключена",
                 onClick = {
                     darkMode = !darkMode
-                    LogCollector.addLog("Settings", "Тёмная тема переключена на $darkMode")
+                    LogCollector.addLog("Settings", "тёмная тема переключена на $darkMode")
                     scope.launch { ThemeManager.saveDarkMode(context, darkMode) }
                 }
             ) { Switch(checked = darkMode, onCheckedChange = {}) }
 
-
-
-            SectionHeader("Оформление")
+            SectionHeader("оформление")
 
             val availableThemes = remember(unlockedThemes) {
                 ThemeManager.allThemes.filter { it.id == "default" || it.id in unlockedThemes }
@@ -263,10 +286,10 @@ fun SettingsScreen(onClose: () -> Unit) {
                 SettingsItem(
                     icon = Icons.Default.Palette,
                     title = theme.name,
-                    subtitle = if (currentThemeId == theme.id) "✓ Активна" else "Нажмите, чтобы применить",
+                    subtitle = if (currentThemeId == theme.id) "активна" else "нажмите чтобы применить",
                     onClick = {
                         if (currentThemeId != theme.id) {
-                            Log.d("Settings", "Применяем тему: ${theme.id}")
+                            Log.d("Settings", "применяем тему: ${theme.id}")
                             currentThemeId = theme.id
                             scope.launch { ThemeManager.saveCurrentTheme(context, theme.id) }
                         }
@@ -279,18 +302,18 @@ fun SettingsScreen(onClose: () -> Unit) {
             if (availableThemes.size == 1) {
                 SettingsItem(
                     icon = Icons.Default.Celebration,
-                    title = "Нет выигранных тем",
-                    subtitle = "Покрутите рулетку в разделе «О приложении» → пасхалка",
+                    title = "нет выигранных тем",
+                    subtitle = "покрутите рулетку в разделе «о приложении» → пасхалка",
                     onClick = {}
                 )
             }
 
-            SectionHeader("Календарь")
+            SectionHeader("календарь")
 
             SettingsItem(
                 icon = Icons.Default.Celebration,
-                title = "Показывать праздники",
-                subtitle = if (showHolidays) "Включено" else "Выключено",
+                title = "показывать праздники",
+                subtitle = if (showHolidays) "включено" else "выключено",
                 onClick = {
                     showHolidays = !showHolidays
                     scope.launch { ThemeManager.saveShowHolidays(context, showHolidays) }
@@ -299,134 +322,54 @@ fun SettingsScreen(onClose: () -> Unit) {
                 Switch(checked = showHolidays, onCheckedChange = {})
             }
 
-=======
-
-            //раздел внешний вид
-            SectionHeader("Внешний вид")
-
-            SettingsItem(
-                icon = Icons.Default.Palette,
-                title = "Тема",
-                subtitle = "Системная (авто)",
-                onClick = { /*TODO*/ }
-            ) {
-                //маленький чип-бейдж справа
-                Surface(
-                    shape = RoundedCornerShape(50),
-                    color = MaterialTheme.colorScheme.secondaryContainer
-                ) {
-                    Text(
-                        text = "Авто",
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSecondaryContainer
-                    )
-                }
-            }
-
-            //раздел календарь
-            SectionHeader("Календарь")
-
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             SettingsItem(
                 icon = Icons.Default.Language,
-                title = "Начало недели",
-                subtitle = "Понедельник",
-<<<<<<< HEAD
+                title = "начало недели",
+                subtitle = "понедельник",
                 onClick = {}
             )
 
-            SectionHeader("Заметки")
-=======
-                onClick = { /*TODO*/ }
-            )
+            SectionHeader("заметки")
 
-            SettingsItem(
-                icon = Icons.Default.Celebration,
-                title = "Показывать праздники",
-                subtitle = "Государственные праздники РФ",
-                onClick = { /*TODO*/ }
-            ) {
-                var checked by remember { mutableStateOf(true) }
-                Switch(
-                    checked = checked,
-                    onCheckedChange = { checked = it }
-                )
-            }
-
-            //раздел заметки
-            SectionHeader("Заметки")
-
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             SettingsItem(
                 icon = Icons.Default.Save,
-                title = "Сохранение данных",
-                subtitle = "Только в памяти — данные не сохраняются",
-<<<<<<< HEAD
+                title = "сохранение данных",
+                subtitle = "только в памяти — данные не сохраняются",
                 onClick = {},
                 enabled = false
             )
 
-            SectionHeader("О приложении")
-=======
-                onClick = { /*TODO: добавить DataStore или Room*/ },
-                enabled = false //пока не реализовано
-            )
+            SectionHeader("о приложении")
 
-            //раздел о приложении
-            SectionHeader("О приложении")
-
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             SettingsItem(
                 icon = Icons.Default.Info,
-                title = "Версия",
+                title = "версия",
                 subtitle = "1.0.0-dev",
-<<<<<<< HEAD
                 onClick = {}
-            )
-            SettingsItem(
-                icon = Icons.Default.BugReport,
-                title = "Сообщить об ошибке",
-                subtitle = "Отправить лог и комментарий",
-                onClick = { showErrorReportDialog = true }
-=======
-                onClick = { }
             )
 
             SettingsItem(
                 icon = Icons.Default.BugReport,
-                title = "Сообщить об ошибке",
-                subtitle = "Открыть форму обратной связи",
-                onClick = { /*TODO*/ }
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
+                title = "сообщить об ошибке",
+                subtitle = "отправить логи файлом в telegram",
+                onClick = { showErrorReportDialog = true }
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-<<<<<<< HEAD
-=======
-            //пасхалка: три быстрых клика на подпись открывают рулетку
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "SmartCalendar",
+                    text = "smartcalendar",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
                     modifier = Modifier.clickable(
                         interactionSource = remember { MutableInteractionSource() },
-<<<<<<< HEAD
                         indication = null
                     ) {
                         val now = System.currentTimeMillis()
-=======
-                        indication = null //убираем стандартную рябь
-                    ) {
-                        val now = System.currentTimeMillis()
-                        //если пауза больше 1.2с — сброс счётчика
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                         if (now - lastClickTime > 1200) secretClicks = 0
                         lastClickTime = now
                         secretClicks++
@@ -437,33 +380,12 @@ fun SettingsScreen(onClose: () -> Unit) {
                     }
                 )
             }
-<<<<<<< HEAD
-=======
 
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
 
-<<<<<<< HEAD
-private fun sendEmail(context: Context, recipient: String, subject: String, body: String) {
-    val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:")
-        putExtra(Intent.EXTRA_EMAIL, arrayOf(recipient))
-        putExtra(Intent.EXTRA_SUBJECT, subject)
-        putExtra(Intent.EXTRA_TEXT, body)
-    }
-    try {
-        context.startActivity(intent)
-    } catch (e: Exception) {
-        Toast.makeText(context, "Установите почтовый клиент", Toast.LENGTH_SHORT).show()
-    }
-}
-
-=======
-//заголовок раздела настроек
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 @Composable
 private fun SectionHeader(title: String) {
     Text(
@@ -476,10 +398,6 @@ private fun SectionHeader(title: String) {
     )
 }
 
-<<<<<<< HEAD
-=======
-//одна строка в списке настроек
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 @Composable
 private fun SettingsItem(
     icon: ImageVector,
@@ -487,11 +405,7 @@ private fun SettingsItem(
     subtitle: String? = null,
     onClick: () -> Unit,
     enabled: Boolean = true,
-<<<<<<< HEAD
     trailing: @Composable (() -> Unit)? = null
-=======
-    trailing: @Composable (() -> Unit)? = null //элемент справа: стрелка, свитч, чип
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 ) {
     Surface(
         modifier = Modifier
@@ -499,13 +413,7 @@ private fun SettingsItem(
             .clip(RoundedCornerShape(14.dp))
             .clickable(enabled = enabled, onClick = onClick),
         shape = RoundedCornerShape(14.dp),
-<<<<<<< HEAD
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = if (enabled) 0.5f else 0.25f)
-=======
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(
-            alpha = if (enabled) 0.5f else 0.25f //серее если недоступно
-        )
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     ) {
         Row(
             modifier = Modifier
@@ -514,10 +422,6 @@ private fun SettingsItem(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-<<<<<<< HEAD
-=======
-            //иконка в круглом фоне
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -534,23 +438,13 @@ private fun SettingsItem(
                     modifier = Modifier.size(20.dp)
                 )
             }
-<<<<<<< HEAD
-=======
 
-            //текст название и подпись
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-<<<<<<< HEAD
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.4f)
-=======
-                    color = MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = if (enabled) 1f else 0.4f
-                    )
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                 )
                 if (subtitle != null) {
                     Text(
@@ -560,11 +454,7 @@ private fun SettingsItem(
                     )
                 }
             }
-<<<<<<< HEAD
-=======
 
-            //справа либо переданный элемент, либо стрелка по умолчанию
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
             if (trailing != null) {
                 trailing()
             } else {

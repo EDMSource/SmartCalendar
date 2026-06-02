@@ -1,21 +1,14 @@
 package com.example.smartcalendar.screens
 
-<<<<<<< HEAD
-
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import com.example.smartcalendar.utils.ThemeManager
 
-
-
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 
-
-=======
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
@@ -25,6 +18,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -41,30 +35,30 @@ import androidx.compose.ui.unit.sp
 
 import com.example.smartcalendar.ui.theme.*
 
-
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-private val WEEK_DAYS = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс") // заголовки столбцов
+private val WEEK_DAYS = listOf("Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Вс")
+
+//модель дня календаря
+data class CalendarDay(
+    val day: Int,
+    val monthValue: Int,
+    val year: Int,
+    val isCurrentMonth: Boolean
+)
 
 @Composable
 fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     var showSearchDialog by remember { mutableStateOf(false) }
     var searchQuery      by remember { mutableStateOf("") }
     var showDayPicker    by remember { mutableStateOf(false) }
     var pickedDay        by remember { mutableStateOf<Int?>(null) }
-<<<<<<< HEAD
 
     var showHolidays by remember { mutableStateOf(true) }
 
-    val notes = remember { mutableStateMapOf<String, MutableList<String>>() } // заметки в памяти
+    val notes = remember { mutableStateMapOf<String, MutableList<String>>() }
 
     val scope = rememberCoroutineScope()
     fun saveNotesToDataStore(context: Context) {
@@ -90,35 +84,45 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
     var managingDay by remember { mutableStateOf<Int?>(null) }
     var currentDate by remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
 
-
-=======
-    var managingDay      by remember { mutableStateOf<Int?>(null) }
-    var currentDate      by remember { mutableStateOf(LocalDate.now().withDayOfMonth(1)) }
-    val notes            = remember { mutableStateMapOf<String, MutableList<String>>() } // заметки в памяти
-
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
     val today          = LocalDate.now()
     val daysInMonth    = currentDate.lengthOfMonth()
-    val firstDayOfWeek = currentDate.dayOfWeek.value // 1=Пн, 7=Вс
+    val firstDayOfWeek = currentDate.dayOfWeek.value
     val monthName      = currentDate.format(DateTimeFormatter.ofPattern("LLLL yyyy", Locale.forLanguageTag("ru")))
-<<<<<<< HEAD
-
-
-=======
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
 
     val holidays = remember {
         mapOf(
-            Pair(1, 1)   to "НГ",   // новый год
+            Pair(1, 1)   to "НГ",
             Pair(12, 31) to "НГ",
-            Pair(1, 7)   to "Рож",  // рождество
-            Pair(2, 23)  to "23Ф",  // день защитника
-            Pair(3, 8)   to "8М",   // женский день
-            Pair(5, 1)   to "1М",   // праздник труда
-            Pair(5, 9)   to "9М",   // день победы
-            Pair(6, 12)  to "12И",  // день россии
-            Pair(11, 4)  to "4Н"    // день народного единства
+            Pair(1, 7)   to "Рож",
+            Pair(2, 23)  to "23Ф",
+            Pair(3, 8)   to "8М",
+            Pair(5, 1)   to "1М",
+            Pair(5, 9)   to "9М",
+            Pair(6, 12)  to "12И",
+            Pair(11, 4)  to "4Н"
         )
+    }
+
+    //расчет списка дней текущей сетки
+    val allDays = remember(currentDate, firstDayOfWeek, daysInMonth) {
+        val prevMonth = currentDate.minusMonths(1)
+        val nextMonth = currentDate.plusMonths(1)
+
+        val daysFromPrevMonth = if (firstDayOfWeek > 1) {
+            val daysInPrev = prevMonth.lengthOfMonth()
+            (daysInPrev - (firstDayOfWeek - 2)..daysInPrev).toList()
+        } else emptyList()
+
+        val daysFromCurrentMonth = (1..daysInMonth).toList()
+
+        val filledCount = daysFromPrevMonth.size + daysFromCurrentMonth.size
+        val daysFromNextMonth = (1..(42 - filledCount)).toList()
+
+        buildList {
+            daysFromPrevMonth.forEach { add(CalendarDay(it, prevMonth.monthValue, prevMonth.year, false)) }
+            daysFromCurrentMonth.forEach { add(CalendarDay(it, currentDate.monthValue, currentDate.year, true)) }
+            daysFromNextMonth.forEach { add(CalendarDay(it, nextMonth.monthValue, nextMonth.year, false)) }
+        }
     }
 
     Column(
@@ -128,7 +132,6 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        // навигация: стрелки + название месяца + поиск + настройки
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -174,7 +177,6 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
             }
         }
 
-        // заголовки дней недели
         Row(modifier = Modifier.fillMaxWidth()) {
             WEEK_DAYS.forEach { day ->
                 Text(
@@ -189,39 +191,20 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // сетка дней
         LazyVerticalGrid(
             columns = GridCells.Fixed(7),
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f), // растягивается на всё свободное место
+                .weight(1f),
             userScrollEnabled = false
         ) {
-            val prevMonth = currentDate.minusMonths(1)
-            val nextMonth = currentDate.plusMonths(1)
-
-            // дни предыдущего месяца для заполнения начала сетки
-            val daysFromPrevMonth = if (firstDayOfWeek > 1) {
-                val daysInPrev = prevMonth.lengthOfMonth()
-                (daysInPrev - (firstDayOfWeek - 2)..daysInPrev).toList()
-            } else emptyList()
-
-            val daysFromCurrentMonth = (1..daysInMonth).toList()
-
-            // дни следующего месяца для заполнения до 42 ячеек
-            val filledCount = daysFromPrevMonth.size + daysFromCurrentMonth.size
-            val daysFromNextMonth = (1..(42 - filledCount)).toList()
-
-            data class CalendarDay(val day: Int, val monthValue: Int, val year: Int, val isCurrentMonth: Boolean)
-
-            val allDays = buildList {
-                daysFromPrevMonth.forEach { add(CalendarDay(it, prevMonth.monthValue, prevMonth.year, false)) }
-                daysFromCurrentMonth.forEach { add(CalendarDay(it, currentDate.monthValue, currentDate.year, true)) }
-                daysFromNextMonth.forEach { add(CalendarDay(it, nextMonth.monthValue, nextMonth.year, false)) }
-            }
-
-            items(allDays.size) { index ->
-                val calDay = allDays[index]
+            items(
+                items = allDays,
+                key = { calDay ->
+                    //уникальный ключ дня для исключения перекрытия
+                    "${calDay.year}-${calDay.monthValue}-${calDay.day}-${calDay.isCurrentMonth}"
+                }
+            ) { calDay ->
                 val isToday = calDay.isCurrentMonth &&
                         calDay.year == today.year &&
                         calDay.monthValue == today.monthValue &&
@@ -235,24 +218,16 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
                         isToday     = isToday,
                         hasNote     = notes[key]?.isNotEmpty() == true,
                         onClick     = { managingDay = calDay.day },
-<<<<<<< HEAD
                         holidayName = if (showHolidays) holiday else null
                     )
                 } else {
                     InactiveDayCell(day = calDay.day, holidayName = if (showHolidays) holiday else null)
-=======
-                        holidayName = holiday
-                    )
-                } else {
-                    InactiveDayCell(day = calDay.day, holidayName = holiday)
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // кнопка добавления заметки
         Button(
             onClick = { showDayPicker = true },
             modifier = Modifier
@@ -270,7 +245,6 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
         Spacer(modifier = Modifier.height(16.dp))
     }
 
-    // диалог выбора дня
     if (showDayPicker) {
         AlertDialog(
             onDismissRequest = { showDayPicker = false; pickedDay = null },
@@ -298,7 +272,6 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
         )
     }
 
-    // диалог управления заметками дня
     if (managingDay != null) {
         val dateKey  = "${currentDate.year}-${currentDate.monthValue}-${managingDay!!}"
         val dayNotes = notes[dateKey] ?: mutableListOf()
@@ -309,7 +282,6 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
             title = { Text("Заметки на $managingDay ${monthName.replaceFirstChar { it.uppercase() }}") },
             text = {
                 Column {
-                    // список существующих заметок с кнопкой удаления
                     dayNotes.forEachIndexed { idx, note ->
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -321,7 +293,7 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
                                 val updated = dayNotes.toMutableList().apply { removeAt(idx) }
                                 if (updated.isEmpty()) notes.remove(dateKey)
                                 else notes[dateKey] = updated
-                                saveNotesToDataStore(context)   // <-- добавить
+                                saveNotesToDataStore(context)
                             }) {
                                 Text("Удалить", color = MaterialTheme.colorScheme.error)
                             }
@@ -329,7 +301,6 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
                         Spacer(modifier = Modifier.height(4.dp))
                     }
                     Spacer(modifier = Modifier.height(8.dp))
-                    // поле новой заметки
                     OutlinedTextField(
                         value = newNoteText,
                         onValueChange = { newNoteText = it },
@@ -342,10 +313,7 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
                             if (newNoteText.isNotBlank()) {
                                 val list = notes.getOrPut(dateKey) { mutableListOf() }
                                 list.add(newNoteText)
-<<<<<<< HEAD
-                                saveNotesToDataStore(context)   // <-- добавили context
-=======
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
+                                saveNotesToDataStore(context)
                                 newNoteText = ""
                             }
                         },
@@ -359,7 +327,6 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
         )
     }
 
-    // диалог поиска заметок
     if (showSearchDialog) {
         var results by remember { mutableStateOf<List<Pair<String, String>>>(emptyList()) }
 
@@ -422,35 +389,20 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
     }
 }
 
-// ячейка текущего месяца
 @Composable
 fun DayCell(
     day: Int,
     isToday: Boolean,
     hasNote: Boolean,
     onClick: () -> Unit,
-<<<<<<< HEAD
     holidayName: String? = null
 ) {
-    // Цвет фона: праздник → жёлтый, сегодня → цвет todayColor из темы, иначе primaryContainer
     val bgColor = when {
         holidayName != null -> Color.Yellow
         isToday -> MaterialTheme.colorScheme.todayColor
         else -> MaterialTheme.colorScheme.primaryContainer
     }
-    // Цвет текста: сегодня → onPrimaryContainer, иначе onPrimaryContainer (можно и onPrimary)
-    val txtColor = if (isToday) MaterialTheme.colorScheme.onPrimaryContainer
-    else MaterialTheme.colorScheme.onPrimaryContainer
-=======
-    holidayName: String? = null // название праздника если есть
-) {
-    val bgColor  = when {
-        holidayName != null -> Color.Yellow // праздник — жёлтый
-        isToday             -> TodayColor
-        else                -> MaterialTheme.colorScheme.primaryContainer
-    }
-    val txtColor = if (isToday) TodayOnColor else MaterialTheme.colorScheme.onPrimaryContainer
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
+    val txtColor = MaterialTheme.colorScheme.onPrimaryContainer
 
     Box(
         modifier = Modifier
@@ -471,12 +423,7 @@ fun DayCell(
                 fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
                 color = txtColor
             )
-<<<<<<< HEAD
             if (hasNote) {
-                // Точка-индикатор: цвет зависит от темы
-=======
-            if (hasNote) { // точка-индикатор заметки
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                 Box(
                     modifier = Modifier
                         .size(5.dp)
@@ -487,11 +434,7 @@ fun DayCell(
                         )
                 )
             }
-<<<<<<< HEAD
             if (holidayName != null) {
-=======
-            if (holidayName != null) { // подпись праздника
->>>>>>> 3a25146faef926a66f560b189c2c33352113cbb6
                 Text(
                     text = holidayName,
                     fontSize = 9.sp,
@@ -503,7 +446,6 @@ fun DayCell(
     }
 }
 
-// ячейка соседнего месяца (серая, некликабельная)
 @Composable
 fun InactiveDayCell(
     day: Int,
