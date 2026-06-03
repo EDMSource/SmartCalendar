@@ -181,23 +181,25 @@ fun SettingsScreen(onClose: () -> Unit) {
                         onClick = {
                             isSending = true
                             scope.launch {
-                                //экспортируем логи в файл
-                                val logFile = LogCollector.exportLogsToFile(context)
+                                val logFile = LogCollector.exportLogsToFile(context) //сохраняем логи в файл
 
-                                val result = CloudflareReporter.sendBugReport(
+                                val success = CloudflareReporter.sendBugReport(
                                     context = context,
                                     comment = errorReportText,
                                     logFile = logFile
-                                )
-                                sendResult = when (result) {
-                                    is CloudflareReporter.ReportResult.Success -> "отправлено! спасибо!"
-                                    is CloudflareReporter.ReportResult.Error -> "ошибка: ${result.message}"
+                                ) //отправляем
+
+                                sendResult = if (success) {
+                                    "отправлено! спасибо!" //успех
+                                } else {
+                                    "ошибка: не удалось отправить" //неудача
                                 }
+
                                 isSending = false
 
-                                delay(2000)
+                                delay(2000) //ждём 2 секунды
                                 if (sendResult == "отправлено! спасибо!") {
-                                    showErrorReportDialog = false
+                                    showErrorReportDialog = false //закрываем диалог
                                     errorReportText = ""
                                     sendResult = null
                                 }

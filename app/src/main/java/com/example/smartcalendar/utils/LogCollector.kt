@@ -1,32 +1,30 @@
 package com.example.smartcalendar.utils
 
 import android.content.Context
-import android.util.Log
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
 object LogCollector {
-    private val logBuffer = mutableListOf<String>()
-    private val maxLogSize = 500
+    private val logBuffer = mutableListOf<String>() //буфер логов
+    private val maxLogSize = 500 //максимум записей
 
     fun addLog(tag: String, message: String) {
         val timestamp = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault()).format(Date())
         val logLine = "$timestamp $tag: $message"
         synchronized(logBuffer) {
             logBuffer.add(logLine)
-            while (logBuffer.size > maxLogSize) logBuffer.removeAt(0)
+            while (logBuffer.size > maxLogSize) logBuffer.removeAt(0) //удаляем старые
         }
-        Log.d("LogCollector", "Добавлено: $tag: $message")
     }
 
-    fun getLogs(): String = synchronized(logBuffer) { logBuffer.joinToString("\n") }
+    fun getLogs(): String = synchronized(logBuffer) { logBuffer.joinToString("\n") } //все логи строкой
 
-    fun clearLogs() = synchronized(logBuffer) { logBuffer.clear() }
+    fun clearLogs() = synchronized(logBuffer) { logBuffer.clear() } //очистить
 
     fun exportLogsToFile(context: Context): File? {
         return synchronized(logBuffer) {
-            if (logBuffer.isEmpty()) return null
+            if (logBuffer.isEmpty()) return null //нет логов
             try {
                 val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                 val fileName = "smartcalendar_logs_$timestamp.txt"
@@ -39,11 +37,9 @@ object LogCollector {
                     appendLine()
                     appendLine(getLogs())
                 })
-                Log.d("LogCollector", "logs exported to ${file.absolutePath}")
                 file
             } catch (e: Exception) {
-                Log.e("LogCollector", "failed to export logs", e)
-                null
+                null //ошибка сохранения
             }
         }
     }
