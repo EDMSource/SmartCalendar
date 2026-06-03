@@ -95,15 +95,28 @@ fun RouletteScreen(onClose: () -> Unit) {
         LogCollector.addLog("Roulette", "Выиграна награда: ${wonReward.name}")
         coroutineScope.launch {
             val themeId = when (wonReward.name) {
-                "Цветущая сакура" -> "sakura"
-                "Мятный градиент" -> "mint"
-                "Лавандовый туман" -> "lavender"
-                "Закат на море" -> "sunset"
+                "Цветущая сакура"   -> "sakura"
+                "Мятный градиент"   -> "mint"
+                "Лавандовый туман"  -> "lavender"
+                "Закат на море"     -> "sunset"
+                "Песочный фон"      -> "sand"
+                "Серый жемчуг"      -> "gray_pearl"
+                "Утреннее небо"     -> "sky"
+                "Рисовая бумага"    -> "rice"
+                "Туманный лес"      -> "fog_forest"
+                "Северное сияние"   -> "aurora"
+                "Мрамор"            -> "marble"
+                "Космос"            -> "space"
+                "Дымка над горами"  -> "mountain"
+                "Живой градиент"    -> "live_gradient"
                 else -> null
             }
             Log.d("Roulette", "Соответствующий themeId = $themeId")
             LogCollector.addLog("Roulette", "Соответствующий themeId = $themeId")
-            themeId?.let { ThemeManager.unlockTheme(context, it) }
+            themeId?.let {
+                ThemeManager.unlockTheme(context, it)
+                ThemeManager.saveCurrentTheme(context, it)
+            }
         }
         isSpinning = false
         spinCount++

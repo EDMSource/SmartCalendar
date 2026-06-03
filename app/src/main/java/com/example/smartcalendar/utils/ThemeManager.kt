@@ -111,8 +111,136 @@ object ThemeManager {
         noteIndicator = Color(0xFFBF360C),
         surfaceVariant = Color(0xFFFFF3E0)
     )
+    val sandTheme = RewardTheme(
+        id = "sand",
+        name = "Песочный фон",
+        emoji = "🏜️",
+        primary = Color(0xFFD4A96A),
+        primaryContainer = Color(0xFFF5E6CC),
+        onPrimaryContainer = Color(0xFF3E2A00),
+        todayColor = Color(0xFFE8C07A),
+        noteIndicator = Color(0xFF8D6E3A),
+        surfaceVariant = Color(0xFFFFF8EE)
+    )
 
-    val allThemes = listOf(defaultTheme, sakuraTheme, mintTheme, lavenderTheme, sunsetTheme)
+    val grayPearlTheme = RewardTheme(
+        id = "gray_pearl",
+        name = "Серый жемчуг",
+        emoji = "🩶",
+        primary = Color(0xFF9E9E9E),
+        primaryContainer = Color(0xFFE0E0E0),
+        onPrimaryContainer = Color(0xFF212121),
+        todayColor = Color(0xFFBDBDBD),
+        noteIndicator = Color(0xFF616161),
+        surfaceVariant = Color(0xFFF5F5F5)
+    )
+
+    val skyTheme = RewardTheme(
+        id = "sky",
+        name = "Утреннее небо",
+        emoji = "🌅",
+        primary = Color(0xFF5B9BD5),
+        primaryContainer = Color(0xFFBBDEFB),
+        onPrimaryContainer = Color(0xFF0D2B4E),
+        todayColor = Color(0xFF90CAF9),
+        noteIndicator = Color(0xFF1976D2),
+        surfaceVariant = Color(0xFFE3F2FD)
+    )
+
+    val riceTheme = RewardTheme(
+        id = "rice",
+        name = "Рисовая бумага",
+        emoji = "📜",
+        primary = Color(0xFFBFA07A),
+        primaryContainer = Color(0xFFF5E6CC),
+        onPrimaryContainer = Color(0xFF3E2A00),
+        todayColor = Color(0xFFD4B896),
+        noteIndicator = Color(0xFF795548),
+        surfaceVariant = Color(0xFFFAF3E0)
+    )
+
+    val fogForestTheme = RewardTheme(
+        id = "fog_forest",
+        name = "Туманный лес",
+        emoji = "🌲",
+        primary = Color(0xFF5C8A6B),
+        primaryContainer = Color(0xFFC8E6C9),
+        onPrimaryContainer = Color(0xFF1B3A28),
+        todayColor = Color(0xFF81C784),
+        noteIndicator = Color(0xFF388E3C),
+        surfaceVariant = Color(0xFFE8F5E9)
+    )
+
+    val auroraTheme = RewardTheme(
+        id = "aurora",
+        name = "Северное сияние",
+        emoji = "🌌",
+        primary = Color(0xFF26C6DA),
+        primaryContainer = Color(0xFFB2EBF2),
+        onPrimaryContainer = Color(0xFF003E47),
+        todayColor = Color(0xFF80DEEA),
+        noteIndicator = Color(0xFF00838F),
+        surfaceVariant = Color(0xFFE0F7FA)
+    )
+
+    val marbleTheme = RewardTheme(
+        id = "marble",
+        name = "Мрамор",
+        emoji = "🪨",
+        primary = Color(0xFF9E9E9E),
+        primaryContainer = Color(0xFFF5F5F5),
+        onPrimaryContainer = Color(0xFF1A1A1A),
+        todayColor = Color(0xFFE0E0E0),
+        noteIndicator = Color(0xFF757575),
+        surfaceVariant = Color(0xFFFAFAFA)
+    )
+
+    val spaceTheme = RewardTheme(
+        id = "space",
+        name = "Космос",
+        emoji = "🚀",
+        primary = Color(0xFF7986CB),
+        primaryContainer = Color(0xFF3F3F7A),
+        onPrimaryContainer = Color(0xFFE8EAF6),
+        todayColor = Color(0xFF9FA8DA),
+        noteIndicator = Color(0xFF5C6BC0),
+        surfaceVariant = Color(0xFF2A2A5A)
+    )
+
+    val mountainTheme = RewardTheme(
+        id = "mountain",
+        name = "Дымка над горами",
+        emoji = "⛰️",
+        primary = Color(0xFF78909C),
+        primaryContainer = Color(0xFFCFD8DC),
+        onPrimaryContainer = Color(0xFF1C2E35),
+        todayColor = Color(0xFFB0BEC5),
+        noteIndicator = Color(0xFF455A64),
+        surfaceVariant = Color(0xFFECEFF1)
+    )
+
+    val liveGradientTheme = RewardTheme(
+        id = "live_gradient",
+        name = "Живой градиент",
+        emoji = "✨",
+        primary = Color(0xFFAB47BC),
+        primaryContainer = Color(0xFFE1BEE7),
+        onPrimaryContainer = Color(0xFF2A003E),
+        todayColor = Color(0xFFCE93D8),
+        noteIndicator = Color(0xFF7B1FA2),
+        surfaceVariant = Color(0xFFF3E5F5)
+    )
+
+
+
+
+    val allThemes = listOf(
+        defaultTheme, sakuraTheme, mintTheme, lavenderTheme, sunsetTheme,
+        sandTheme, grayPearlTheme, skyTheme, riceTheme, fogForestTheme,
+        auroraTheme, marbleTheme, spaceTheme, mountainTheme,
+        liveGradientTheme,
+    )
+
 
     fun getThemeById(id: String): RewardTheme = allThemes.find { it.id == id } ?: defaultTheme
 

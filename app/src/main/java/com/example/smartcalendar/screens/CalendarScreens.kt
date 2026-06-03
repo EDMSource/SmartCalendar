@@ -23,6 +23,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,7 +58,6 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
     var showDayPicker    by remember { mutableStateOf(false) }
     var pickedDay        by remember { mutableStateOf<Int?>(null) }
 
-    var showHolidays by remember { mutableStateOf(true) }
 
     val notes = remember { mutableStateMapOf<String, MutableList<String>>() }
 
@@ -70,6 +71,8 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
     }
 
     val context = LocalContext.current
+    val showHolidays by ThemeManager.getShowHolidaysFlow(context)
+        .collectAsState(initial = true)
 
     LaunchedEffect(Unit) {
         ThemeManager.getNotesFlow(context).collect { savedNotes ->
@@ -195,8 +198,9 @@ fun CalendarScreen(onOpenSettings: () -> Unit = {}) {
             columns = GridCells.Fixed(7),
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f),
-            userScrollEnabled = false
+                .heightIn(min = 300.dp),  // убираем weight(1f), добавляем min-высоту
+            userScrollEnabled = false,
+            verticalArrangement = Arrangement.spacedBy(0.dp)
         ) {
             items(
                 items = allDays,
@@ -406,8 +410,8 @@ fun DayCell(
 
     Box(
         modifier = Modifier
-            .padding(3.dp)
-            .aspectRatio(1f)
+            .padding(2.dp)
+            .size(44.dp)
             .clip(CircleShape)
             .background(bgColor)
             .clickable(onClick = onClick),
